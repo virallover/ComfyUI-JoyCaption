@@ -1,9 +1,16 @@
 [project]
 name = "ComfyUI-JoyCaption"
-description = "Custom ComfyUI node for powerful Joy Caption LLM captioning."
-version = "0.0.1"
+description = "ComfyUI custom node powered by LLaVA VLM for advanced image captioning with customizable styles and memory-efficient inference."
+version = "1.0.0"
 license = {file = "LICENSE"}
-dependencies = [""]
+dependencies = [
+    "torch>=2.0.0",
+    "transformers>=4.36.0",
+    "huggingface_hub>=0.19.0",
+    "accelerate",
+    "bitsandbytes>=0.42.0",
+    "Pillow>=10.0.0"
+]
 
 [project.urls]
 Repository = "https://github.com/1038lab/ComfyUI-JoyCaption"
