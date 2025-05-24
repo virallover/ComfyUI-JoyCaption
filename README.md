@@ -63,9 +63,20 @@ After downloading, place the model files in your `ComfyUI/models/diffusion_model
 | Parameter | Description | Default | Range |
 | --------- | ----------- | ------- | ----- |
 | **Model** | The JoyCaption model to use | `llama-joycaption-beta-one-hf-llava` | - |
-| **Memory Mode** | Memory optimization settings | Default | Default, Balanced (8-bit), Maximum Savings (4-bit) |
+| **Memory Control** | Memory optimization settings | Default | Default (fp32), Balanced (8-bit), Maximum Savings (4-bit) |
 | **Caption Type** | Caption style selection | Descriptive | Descriptive, Descriptive (Casual), Straightforward, Tags, Technical, Artistic |
 | **Caption Length** | Output length control | medium | any, very short, short, medium, long, very long |
+
+
+### Quantization Options
+
+| Mode | Precision | Memory Usage | Speed | Quality | Recommended GPU |
+|------|-----------|--------------|-------|---------|----------------|
+| Default | fp32 | ~16GB | 1x | Best | 24GB+ |
+| Default | bf16 | ~8GB | 1.5x | Excellent | 16GB+ |
+| Default | fp16 | ~8GB | 2x | Very Good | 16GB+ |
+| Balanced | 8-bit | ~4GB | 2.5x | Good | 12GB+ |
+| Maximum Savings | 4-bit | ~2GB | 3x | Acceptable | 8GB+ |
 
 #### Advanced Node
 
@@ -77,6 +88,7 @@ After downloading, place the model files in your `ComfyUI/models/diffusion_model
 | **Temperature** | Generation temperature | 0.6 | 0.0-2.0 |
 | **Top-p** | Sampling parameter | 0.9 | 0.0-1.0 |
 | **Top-k** | Top-k sampling | 0 | 0-100 |
+| **Precision** | Use fp32 for best quality, bf16 for balanced performance, fp16 for maximum speed. 8-bit and 4-bit quantization provide significant memory savings with minimal quality impact |
 
 ## Setting Tips
 
@@ -117,7 +129,6 @@ Future plans include:
 * Additional optimization options
 * Improved memory management
 * Batch processing support
-
 
 ## Credits
 
