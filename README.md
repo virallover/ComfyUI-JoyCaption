@@ -2,6 +2,8 @@
 
 ComfyUI custom node powered by LLaVA VLM for advanced image captioning with customizable styles and memory-efficient inference.
 
+![Joycaption_node](example_workflows/Joycaption_node.png)
+
 ## Features
 
 - Simple and user-friendly interface
