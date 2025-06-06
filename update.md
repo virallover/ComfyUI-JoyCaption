@@ -9,6 +9,8 @@
 
 [![Joycaption_node](example_workflows/batch_image_text_output.jpg)](https://github.com/1038lab/ComfyUI-JoyCaption/blob/main/example_workflows/batch_image_text_output.json)
 
+![Batch Caption](https://github.com/user-attachments/assets/2e03348d-213e-4a49-b303-375ff129f66d)
+
 ### Memory Management
 - Implemented efficient memory handling for large image processing
 - Added automatic memory cleanup after processing
