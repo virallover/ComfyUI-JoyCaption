@@ -162,6 +162,7 @@ class JC:
                 "quantization":   (list(MEMORY_EFFICIENT_CONFIGS.keys()), {"default": "Balanced (8-bit)", "tooltip": "Choose between speed and quality. 8-bit is recommended for most users"}),
                 "prompt_style":   (list(CAPTION_TYPE_MAP.keys()), {"default": "Descriptive", "tooltip": "Select the style of caption you want to generate"}),
                 "caption_length": (CAPTION_LENGTH_CHOICES, {"default": "any", "tooltip": "Control the length of the generated caption"}),
+                "memory_management": (["Keep in Memory", "Clear After Run"], {"default": "Keep in Memory", "tooltip": "Choose how to manage model memory. 'Keep in Memory' for faster processing, 'Clear After Run' for limited VRAM"}),
             },
             "optional": {
                 "extra_options": ("JOYCAPTION_EXTRA_OPTIONS", {"tooltip": "Additional options to customize the caption generation"}),
@@ -178,36 +179,52 @@ class JC:
         self.current_memory_mode = None
         self.current_model = None
     
-    def generate(self, image, model, quantization, prompt_style, caption_length, extra_options=None):
-        if self.predictor is None or self.current_memory_mode != quantization or self.current_model != model:
-            if self.predictor is not None:
+    def generate(self, image, model, quantization, prompt_style, caption_length, memory_management, extra_options=None):
+        try:
+            if self.predictor is None or self.current_memory_mode != quantization or self.current_model != model:
+                if self.predictor is not None:
+                    del self.predictor
+                    self.predictor = None
+                    torch.cuda.empty_cache()
+                
+                try:
+                    model_name = HF_MODELS[model]["name"]
+                    self.predictor = JC_Models(model_name, quantization)
+                    self.current_memory_mode = quantization
+                    self.current_model = model
+                except Exception as e:
+                    return (f"Error loading model: {e}",)
+            
+            prompt = build_prompt(prompt_style, caption_length, extra_options[0] if extra_options else [], extra_options[1] if extra_options else "{NAME}")
+            system_prompt = MODEL_SETTINGS["default_system_prompt"]
+            
+            pil_image = ToPILImage()(image[0].permute(2, 0, 1))
+            response = self.predictor.generate(
+                image=pil_image,
+                system=system_prompt,
+                prompt=prompt,
+                max_new_tokens=MODEL_SETTINGS["default_max_tokens"],
+                temperature=MODEL_SETTINGS["default_temperature"],
+                top_p=MODEL_SETTINGS["default_top_p"],
+                top_k=MODEL_SETTINGS["default_top_k"],
+            )
+
+            if memory_management == "Clear After Run":
                 del self.predictor
                 self.predictor = None
                 torch.cuda.empty_cache()
-            
-            try:
-                model_name = HF_MODELS[model]["name"]
-                self.predictor = JC_Models(model_name, quantization)
-                self.current_memory_mode = quantization
-                self.current_model = model
-            except Exception as e:
-                return (f"Error loading model: {e}",)
-        
-        prompt = build_prompt(prompt_style, caption_length, extra_options[0] if extra_options else [], extra_options[1] if extra_options else "{NAME}")
-        system_prompt = MODEL_SETTINGS["default_system_prompt"]
-        
-        pil_image = ToPILImage()(image[0].permute(2, 0, 1))
-        response = self.predictor.generate(
-            image=pil_image,
-            system=system_prompt,
-            prompt=prompt,
-            max_new_tokens=MODEL_SETTINGS["default_max_tokens"],
-            temperature=MODEL_SETTINGS["default_temperature"],
-            top_p=MODEL_SETTINGS["default_top_p"],
-            top_k=MODEL_SETTINGS["default_top_k"],
-        )
+                import gc
+                gc.collect()
 
-        return (response,)
+            return (response,)
+        except Exception as e:
+            if memory_management == "Clear After Run":
+                del self.predictor
+                self.predictor = None
+                torch.cuda.empty_cache()
+                import gc
+                gc.collect()
+            raise e
 
 class JC_adv:
     @classmethod
@@ -225,6 +242,7 @@ class JC_adv:
                 "top_p":          ("FLOAT",  {"default": MODEL_SETTINGS["default_top_p"], "min": 0.0, "max": 1.0, "step": 0.01, "tooltip": "Control the diversity of the output. Higher values allow more diverse word choices"}),
                 "top_k":          ("INT",    {"default": MODEL_SETTINGS["default_top_k"], "min": 0,   "max": 100, "tooltip": "Limit the number of possible next tokens. Lower values make the output more focused"}),
                 "custom_prompt":  ("STRING", {"default": "", "multiline": True, "tooltip": "Custom prompt template. If empty, will use the selected prompt style"}),
+                "memory_management": (["Keep in Memory", "Clear After Run"], {"default": "Keep in Memory", "tooltip": "Choose how to manage model memory. 'Keep in Memory' for faster processing, 'Clear After Run' for limited VRAM"}),
             },
             "optional": {
                 "extra_options": ("JOYCAPTION_EXTRA_OPTIONS", {"tooltip": "Additional options to customize the caption generation"}),
@@ -241,40 +259,56 @@ class JC_adv:
         self.current_memory_mode = None
         self.current_model = None
     
-    def generate(self, image, model, quantization, prompt_style, caption_length, max_new_tokens, temperature, top_p, top_k, custom_prompt, extra_options=None):
-        if self.predictor is None or self.current_memory_mode != quantization or self.current_model != model:
-            if self.predictor is not None:
+    def generate(self, image, model, quantization, prompt_style, caption_length, max_new_tokens, temperature, top_p, top_k, custom_prompt, memory_management, extra_options=None):
+        try:
+            if self.predictor is None or self.current_memory_mode != quantization or self.current_model != model:
+                if self.predictor is not None:
+                    del self.predictor
+                    self.predictor = None
+                    torch.cuda.empty_cache()
+                
+                try:
+                    model_name = HF_MODELS[model]["name"]
+                    self.predictor = JC_Models(model_name, quantization)
+                    self.current_memory_mode = quantization
+                    self.current_model = model
+                except Exception as e:
+                    return (f"Error loading model: {e}", "")
+            
+            if custom_prompt and custom_prompt.strip():
+                prompt = custom_prompt.strip()
+            else:
+                prompt = build_prompt(prompt_style, caption_length, extra_options[0] if extra_options else [], extra_options[1] if extra_options else "{NAME}")
+            
+            system_prompt = MODEL_SETTINGS["default_system_prompt"]
+            
+            pil_image = ToPILImage()(image[0].permute(2, 0, 1))
+            response = self.predictor.generate(
+                image=pil_image,
+                system=system_prompt,
+                prompt=prompt,
+                max_new_tokens=max_new_tokens,
+                temperature=temperature,
+                top_p=top_p,
+                top_k=top_k,
+            )
+
+            if memory_management == "Clear After Run":
                 del self.predictor
                 self.predictor = None
                 torch.cuda.empty_cache()
-            
-            try:
-                model_name = HF_MODELS[model]["name"]
-                self.predictor = JC_Models(model_name, quantization)
-                self.current_memory_mode = quantization
-                self.current_model = model
-            except Exception as e:
-                return (f"Error loading model: {e}", "")
-        
-        if custom_prompt and custom_prompt.strip():
-            prompt = custom_prompt.strip()
-        else:
-            prompt = build_prompt(prompt_style, caption_length, extra_options[0] if extra_options else [], extra_options[1] if extra_options else "{NAME}")
-        
-        system_prompt = MODEL_SETTINGS["default_system_prompt"]
-        
-        pil_image = ToPILImage()(image[0].permute(2, 0, 1))
-        response = self.predictor.generate(
-            image=pil_image,
-            system=system_prompt,
-            prompt=prompt,
-            max_new_tokens=max_new_tokens,
-            temperature=temperature,
-            top_p=top_p,
-            top_k=top_k,
-        )
+                import gc
+                gc.collect()
 
-        return (prompt, response)
+            return (prompt, response)
+        except Exception as e:
+            if memory_management == "Clear After Run":
+                del self.predictor
+                self.predictor = None
+                torch.cuda.empty_cache()
+                import gc
+                gc.collect()
+            raise e
 
 NODE_CLASS_MAPPINGS = {
     "JC": JC,
