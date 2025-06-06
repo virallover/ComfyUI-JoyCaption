@@ -4,6 +4,13 @@ ComfyUI custom node powered by LLaVA VLM for advanced image captioning with cust
 
 ![Joycaption_node](example_workflows/Joycaption_node.png)
 
+## News & Updates
+- **2025/06/05**: Update ComfyUI-RMBG to **v1.1.0** ( [update.md](https://github.com/1038lab/ComfyUI-JoyCaption/blob/main/update.md#v110-20250606) )
+
+[![Joycaption_node](example_workflows/batch_image_text_output.jpg)](https://github.com/1038lab/ComfyUI-JoyCaption/blob/main/example_workflows/batch_image_text_output.json)
+
+- Add Caption tools
+
 ## Features
 
 - Simple and user-friendly interface
