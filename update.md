@@ -7,6 +7,8 @@
 - Integrated memory management system
 - Added caption tools for text processing
 
+[![Joycaption_node](example_workflows/batch_image_text_output.jpg)](https://github.com/1038lab/ComfyUI-JoyCaption/blob/main/example_workflows/batch_image_text_output.json)
+
 ### Memory Management
 - Implemented efficient memory handling for large image processing
 - Added automatic memory cleanup after processing
