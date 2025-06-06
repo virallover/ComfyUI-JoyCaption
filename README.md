@@ -1,6 +1,6 @@
 # ComfyUI-JoyCaption
 
-ComfyUI custom node powered by LLaVA VLM for advanced image captioning with customizable styles and memory-efficient inference.
+Joy Caption is a ComfyUI custom node powered by the LLaVA model for efficient, stylized image captioning. Caption Tools nodes handle batch image processing and automatic separation of caption text.
 
 ![Joycaption_node](example_workflows/Joycaption_node.png)
 
