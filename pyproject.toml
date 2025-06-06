@@ -1,7 +1,7 @@
 [project]
 name = "ComfyUI-JoyCaption"
-description = "ComfyUI custom node powered by LLaVA VLM for advanced image captioning with customizable styles and memory-efficient inference."
-version = "1.0.0"
+description = "Joy Caption is a ComfyUI custom node powered by the LLaVA model for efficient, stylized image captioning. Caption Tools nodes handle batch image processing and automatic separation of caption text."
+version = "1.1.0"
 license = {file = "LICENSE"}
 dependencies = [
     "torch>=2.0.0",
