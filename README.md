@@ -47,7 +47,7 @@ The models will be automatically downloaded and renamed on first use, or you can
 | JoyCaption Beta One | [Download](https://huggingface.co/fancyfeast/llama-joycaption-beta-one-hf-llava) |
 | JoyCaption Alpha Two | [Download](https://huggingface.co/fancyfeast/llama-joycaption-alpha-two-hf-llava) |
 
-After downloading, place the model files in your `ComfyUI/models/diffusion_models/JoyCaption` directory.
+After downloading, place the model files in your `ComfyUI/models/LLM/` directory.
 
 ## Basic Usage
 
