@@ -230,6 +230,11 @@
             "description": "If there is a watermark, you must mention it.",
             "default": false
         },
+        "avoid_water_mark": {
+            "name": "Avoid Water Mark",
+            "description": "Do not mention the watermark.",
+            "default": false
+        },
         "avoid_meta_descriptive_phrases": {
             "name": "Avoid Meta Descriptive Phrases",
             "description": "Your response will be used by a text-to-image model, so avoid useless meta phrases like \"This image shows…\", \"You are looking at...\", etc.",
